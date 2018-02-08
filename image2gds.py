@@ -8,17 +8,18 @@ from collections import deque
 
 
 def auto_canny(image, sigma=0.33):
+"""canny edge detection """
         # compute the median of the single channel pixel intensities
         v = np.median(image)
         # apply automatic Canny edge detection using the computed median
         lower = int(max(0, (1.0 - sigma) * v))
         upper = int(min(255, (1.0 + sigma) * v))
         edged = cv2.Canny(image, lower, upper)
-
         # return the edged image
         return edged
 
 def image2corners(args):
+"""get edges and corners from image"""
     img = cv2.imread(args.input_image)
     gray = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
     # find Harris corners
@@ -427,8 +428,10 @@ if (args.out_file is not None):
     if (args.corner_seq is None):
         print('\tUse auto mode: connect for H-V polygon')
         autoHV(corners,ans)
+        print('\tSuccessfully output gds :)')
     else:
         print('\tUse manual mode: input vertice sequence')
         corners2gds(corners,args)
+        print('\tSuccessfully output gds :)')
 else:
-    print("\tNo specify output file, no gds output")
+    print("\tWarning: No specify output file, no gds output")
