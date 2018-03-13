@@ -111,7 +111,7 @@ def auto_connect(hLines,vLines,corners):
     
     pairs=[]
     lines=hLines+vLines
-    epsilon=2
+    epsilon=2 #separate lines usually has dist larger than 2 pixel
     for line in lines:
         # print('line',line)
         # print('end',endPoint(line))
@@ -175,7 +175,7 @@ def auto_connect(hLines,vLines,corners):
     return polyset
 
 def nearestPoint(pairs,corners):
-    epsilon=4
+    epsilon=4 # corner from harris(stat center), edge from canny,deviation could be large 
     for i in range(pairs.shape[0]):
         for j in range(pairs.shape[1]):
             for corner in corners:
@@ -205,51 +205,51 @@ def pairsFilter(pairs):
             uniqPairs.append(pair)
     return uniqPairs
 
-def addPoint(polycorner,pairs,idx):
-    if idx:    
-        pairs=np.delete(pairs,idx,axis=0)
-    
-    if np.all(polycorner[0] == polycorner[-1]):
-        print('break:',polycorner)
-        return polycorner,pairs,idx
-
-    epsilon=4
-    # for i, pair in enumerate(pairs):
-    print('len pairs',pairs.shape)
-    # for i in range(pairs.shape[0]):
-    idx=[]
-    for i, pair in enumerate(pairs):
-        # pair=pairs[i]
-        print('pair:',pair)
-        print('poly:',polycorner)
-        # for j  in range(pair.shape[0]):
-        #     point=pair[j]
-        for j, point in enumerate(pair):
-            dist1=distance(point,polycorner[0])
-            dist2=distance(point,polycorner[-1])
-            print('point',point,'dist',dist1,dist2)
-            if dist1<epsilon:
-                if j==1:
-                    polycorner.extendleft(pair[::-1])
-                else:
-                    polycorner.extendleft(pair)
-                # pairs=np.delete(pairs,i,axis=0)
-                # print('head',polycorner[0])
-                # print('tail',polycorner[-1])
-                idx.append(i)
-                [polycorner,pairs,idx]=addPoint(polycorner,pairs,idx)
-            elif dist2<epsilon:
-                if j==1:
-                    polycorner.extend(pair[::-1])
-                else:
-                    polycorner.extend(pair)
-                # pairs=np.delete(pairs,i,axis=0)
-                # print('head',polycorner[0])
-                # print('tail',polycorner[-1])
-                idx.append(i)
-                [polycorner,pairs,idx]=addPoint(polycorner,pairs,idx)
-            else:
-                continue
+# def addPoint(polycorner,pairs,idx):
+#     if idx:    
+#         pairs=np.delete(pairs,idx,axis=0)
+#     
+#     if np.all(polycorner[0] == polycorner[-1]):
+#         print('break:',polycorner)
+#         return polycorner,pairs,idx
+#
+#     epsilon=4
+#     # for i, pair in enumerate(pairs):
+#     print('len pairs',pairs.shape)
+#     # for i in range(pairs.shape[0]):
+#     idx=[]
+#     for i, pair in enumerate(pairs):
+#         # pair=pairs[i]
+#         print('pair:',pair)
+#         print('poly:',polycorner)
+#         # for j  in range(pair.shape[0]):
+#         #     point=pair[j]
+#         for j, point in enumerate(pair):
+#             dist1=distance(point,polycorner[0])
+#             dist2=distance(point,polycorner[-1])
+#             print('point',point,'dist',dist1,dist2)
+#             if dist1<epsilon:
+#                 if j==1:
+#                     polycorner.extendleft(pair[::-1])
+#                 else:
+#                     polycorner.extendleft(pair)
+#                 # pairs=np.delete(pairs,i,axis=0)
+#                 # print('head',polycorner[0])
+#                 # print('tail',polycorner[-1])
+#                 idx.append(i)
+#                 [polycorner,pairs,idx]=addPoint(polycorner,pairs,idx)
+#             elif dist2<epsilon:
+#                 if j==1:
+#                     polycorner.extend(pair[::-1])
+#                 else:
+#                     polycorner.extend(pair)
+#                 # pairs=np.delete(pairs,i,axis=0)
+#                 # print('head',polycorner[0])
+#                 # print('tail',polycorner[-1])
+#                 idx.append(i)
+#                 [polycorner,pairs,idx]=addPoint(polycorner,pairs,idx)
+#             else:
+#                 continue
 
 def addPoint2(polycorner,pairs):
     epsilon=4
