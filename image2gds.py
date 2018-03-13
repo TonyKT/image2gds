@@ -384,6 +384,21 @@ def corners2gds(corners,args):
         gdspy.write_gds(args.out_file,unit=args.scale*1.0e-9,precision=1.0e-9)
 
 def poly2gds(polyvertice,corners,args):
+    f=open('auto.seq','w')
+    epsilon=4
+    for vset in polyvertice:
+        # print('vset',vset)
+        seqList=[]
+        for v in vset:
+            for i,corner in enumerate(corners):
+                dist=distance(v, corner)
+                if dist<=epsilon:    
+                    # print('dist',dist)
+                    seqList.append(i)
+                    continue
+        f.write(','.join(str(x) for x in seqList)+'\n')
+        # print('seqList',seqList)
+    f.close()
     poly_cell=gdspy.Cell('tmp')
     poly=gdspy.PolygonSet(polyvertice,1)
     # poly_cell.add(poly)
