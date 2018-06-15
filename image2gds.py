@@ -413,6 +413,7 @@ def poly2gds(polyvertice,corners,args):
             xpos=(xlength+xsep)*(i+1)
             ypos=(ylength+ysep)*(j+1)
             trans=gdspy.copy(poly,xpos,ypos)
+            # print poly
             poly_cell.add(trans)
 
     if args.out_file is not None: 
