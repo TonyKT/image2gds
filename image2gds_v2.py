@@ -35,9 +35,6 @@ def getContour(args):
 def contour2gds(contour0,args):
     contour=[[ele[0] for ele in arr] for arr in contour0]
     # print contour
-    poly_cell=gdspy.Cell('tmp')
-    poly=gdspy.PolygonSet(contour,1)
-    # poly_cell.add(poly)
     flat_list = [item for sublist in contour for item in sublist]
     # print 'flat_list',flat_list
     x=[arr[0] for arr in flat_list]
@@ -46,6 +43,17 @@ def contour2gds(contour0,args):
     # print 'y', y
     xlength=max(x)-min(x)
     ylength=max(y)-min(y)
+    
+    maxY=max(y)
+    contour=[[[ele[0][0],maxY-ele[0][1]] for ele in arr] for arr in contour0]
+    
+    # for sublist in contour:
+    #     for ele in sublist:
+    #         ele[1]=maxY-ele[1]
+
+    poly_cell=gdspy.Cell('tmp')
+    poly=gdspy.PolygonSet(contour,1)
+    # poly_cell.add(poly)
     # print 'max/min x',max(x),min(x)
     # print 'max/min y',max(y),min(y)
     # print 'length',xlength,ylength
