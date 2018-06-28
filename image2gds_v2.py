@@ -17,8 +17,23 @@ def auto_canny(image, sigma=0.33):
 
 def getContour(args):
     img = cv2.imread(args.input_image)
-    dst=auto_canny(img)
-    dst = cv2.dilate(dst,None)
+    image_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    # image_gray=cv2.bitwise_not(image_gray)
+    if args.background=='white':
+        ret,dst=cv2.threshold(image_gray,0,255,cv2.THRESH_BINARY_INV+cv2.THRESH_OTSU)
+    elif args.background=='black':
+        ret,dst=cv2.threshold(image_gray,0,255,cv2.THRESH_BINARY+cv2.THRESH_OTSU)
+    else:
+        sys.exit('\tError: background color not supported. use white or black')
+    # dst = cv2.dilate(dst,None)
+    
+    # dst=auto_canny(img)
+    # dst = cv2.dilate(dst,None)
+    # kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (1, 1))
+    # img = cv2.dilate(dst, kernel, iterations=1)
+    # img = cv2.erode(img, kernel, iterations=2)
+    # dst = cv2.dilate(img, kernel, iterations=1)
+
     cv2.imwrite('contour.png',dst)
     dst = np.uint8(dst)
     im2, contour, hierarchy = cv2.findContours(dst,cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)
@@ -79,6 +94,7 @@ parser.add_argument('-ny',dest='nY',default=1,help='replicate ny times along y a
 parser.add_argument('-sep',dest='sep',default=0.1,help='separation ratio',type=float)
 parser.add_argument('-scale',dest='scale',default=1.0,help='unit=scale nm',type=float)
 parser.add_argument('-o',dest='out_file',help='output file',type=str)
+parser.add_argument('-bg',dest='background',default='white',help='background color of image',type=str)
 args=parser.parse_args()
 contour=getContour(args)
 contour2gds(contour,args)
