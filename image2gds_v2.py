@@ -18,10 +18,13 @@ def auto_canny(image, sigma=0.33):
 def getContour(args):
     img = cv2.imread(args.input_image)
     image_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    # image_gray=cv2.bitwise_not(image_gray)
+    image_gray = cv2.dilate(image_gray,None)
+    #Otsu's Binarization
     if args.background=='white':
+        image_gray= cv2.copyMakeBorder(image_gray,10,10,10,10,cv2.BORDER_CONSTANT,value=[255,255,255])
         ret,dst=cv2.threshold(image_gray,0,255,cv2.THRESH_BINARY_INV+cv2.THRESH_OTSU)
     elif args.background=='black':
+        image_gray= cv2.copyMakeBorder(image_gray,10,10,10,10,cv2.BORDER_CONSTANT,value=[0,0,0])
         ret,dst=cv2.threshold(image_gray,0,255,cv2.THRESH_BINARY+cv2.THRESH_OTSU)
     else:
         sys.exit('\tError: background color not supported. use white or black')
@@ -35,43 +38,52 @@ def getContour(args):
     # dst = cv2.dilate(img, kernel, iterations=1)
 
     cv2.imwrite('contour.png',dst)
+    #findContour
     dst = np.uint8(dst)
     im2, contour, hierarchy = cv2.findContours(dst,cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)
 
-    # im = cv2.imread(args.input_image)
-    # imgray = cv2.cvtColor(im,cv2.COLOR_BGR2GRAY)
-    # ret,thresh = cv2.threshold(imgray,127,255,0)
-    # im2, contour, hierarchy = cv2.findContours(thresh,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
-    # print contour
-    # cv2.drawContours(im2, contour, -1, (0,255,0), 3)
-    # cv2.imwrite('contour.png',im2)
     return contour
 
+def sharpenCorner(contour,args):
+    """ remove  nonHV corner """
+    epsilon=3
+    newContour=[]
+    for poly in contour:
+        poly=np.array(poly)
+        nP=len(poly)
+        polyA=poly[:nP-1]
+        polyB=poly[1:]
+        dist = [(a - b)**2 for a, b in zip(polyA, polyB)]
+        if dist: 
+            dist = np.sqrt(np.sum(dist,axis=1))
+            for i,d in enumerate(dist):
+                if d<epsilon and all(poly[i]-poly[i+1]):
+                    corner=np.array([poly[i][0],poly[i+1][1]])
+                    if all(poly[i+2]-corner) or all(poly[i-1]-corner):
+                        corner=np.array([poly[i+1][0],poly[i][1]])
+                    poly[i]=corner
+                    poly[i+1]=corner
+        newContour.append(poly)
+    return newContour 
+
 def contour2gds(contour0,args):
+    """transform contour list to gds """    
     contour=[[ele[0] for ele in arr] for arr in contour0]
-    # print contour
+    contour=sharpenCorner(contour,args)
     flat_list = [item for sublist in contour for item in sublist]
-    # print 'flat_list',flat_list
+    
     x=[arr[0] for arr in flat_list]
     y=[arr[1] for arr in flat_list]
-    # print 'x', x
-    # print 'y', y
     xlength=max(x)-min(x)
     ylength=max(y)-min(y)
     
     maxY=max(y)
-    contour=[[[ele[0][0],maxY-ele[0][1]] for ele in arr] for arr in contour0]
+    contour=[[[ele[0],maxY-ele[1]] for ele in arr] for arr in contour]
     
-    # for sublist in contour:
-    #     for ele in sublist:
-    #         ele[1]=maxY-ele[1]
 
     poly_cell=gdspy.Cell('tmp')
     poly=gdspy.PolygonSet(contour,1)
-    # poly_cell.add(poly)
-    # print 'max/min x',max(x),min(x)
-    # print 'max/min y',max(y),min(y)
-    # print 'length',xlength,ylength
+    
     nX=args.nX
     nY=args.nY
     xsep=max(xlength,ylength)*args.sep
