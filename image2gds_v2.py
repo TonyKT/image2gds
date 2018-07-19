@@ -18,7 +18,7 @@ def auto_canny(image, sigma=0.33):
 def getContour(args):
     img = cv2.imread(args.input_image)
     image_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    image_gray = cv2.dilate(image_gray,None)
+    # image_gray = cv2.dilate(image_gray,None)
     #Otsu's Binarization
     if args.background=='white':
         image_gray= cv2.copyMakeBorder(image_gray,10,10,10,10,cv2.BORDER_CONSTANT,value=[255,255,255])
