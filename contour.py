@@ -18,10 +18,13 @@ def auto_canny(image, sigma=0.33):
 def getContour(args):
     img = cv2.imread(args.input_image)
     image_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    # image_gray=cv2.bitwise_not(image_gray)
+    image_gray = cv2.dilate(image_gray,None)
+    #Otsu's Binarization
     if args.background=='white':
+        image_gray= cv2.copyMakeBorder(image_gray,10,10,10,10,cv2.BORDER_CONSTANT,value=[255,255,255])
         ret,dst=cv2.threshold(image_gray,0,255,cv2.THRESH_BINARY_INV+cv2.THRESH_OTSU)
     elif args.background=='black':
+        image_gray= cv2.copyMakeBorder(image_gray,10,10,10,10,cv2.BORDER_CONSTANT,value=[0,0,0])
         ret,dst=cv2.threshold(image_gray,0,255,cv2.THRESH_BINARY+cv2.THRESH_OTSU)
     else:
         sys.exit('\tError: background color not supported. use white or black')
@@ -37,6 +40,8 @@ def getContour(args):
     cv2.imwrite('contour.png',dst)
     dst = np.uint8(dst)
     im2, contour, hierarchy = cv2.findContours(dst,cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)
+    # dst = np.uint32(dst)
+    # im2, contour, hierarchy = cv2.findContours(dst,cv2.RETR_FLOODFILL,cv2.CHAIN_APPROX_SIMPLE)
 
     # im = cv2.imread(args.input_image)
     # imgray = cv2.cvtColor(im,cv2.COLOR_BGR2GRAY)
@@ -45,11 +50,75 @@ def getContour(args):
     # print contour
     # cv2.drawContours(im2, contour, -1, (0,255,0), 3)
     # cv2.imwrite('contour.png',im2)
-    return contour
 
+    return contour
+#
+# def seqCorner(poly):
+#     epsilon=3
+#     poly=np.array(poly)
+#     print poly
+#     nP=len(poly)
+#     polyA=poly[:nP-1]
+#     polyB=poly[1:]
+#     print 'polyA',polyA
+#     print 'polyB',polyB
+#     dist = [(a - b)**2 for a, b in zip(polyA, polyB)]
+#     if dist: 
+#         dist = np.sqrt(np.sum(dist,axis=1))
+#         for i,d in enumerate(dist):
+#             if d<epsilon and all(poly[i]-poly[i+1]):
+#                 print i, d
+#                 print poly[i],poly[i+1],poly[i]-poly[i+1]
+#                 corner=np.array([poly[i][0],poly[i+1][1]])
+#                 if not all(poly[i+2]-corner) and not all(poly[i-1]-corner):
+#                     continue
+#                 else:
+#                     corner=np.array([poly[i+1][0],poly[i][1]])
+#                 poly[i]=corner
+#                 poly[i+1]=corner
+#             continue
+#         # poly=np.vstack({tuple(row) for row in poly})
+#     print poly
+#         # exit()
+#     return poly
+def sharpenCorner(contour,args):
+    epsilon=3
+    newContour=[]
+    for poly in contour:
+        poly=np.array(poly)
+        print poly
+        nP=len(poly)
+        polyA=poly[:nP-1]
+        polyB=poly[1:]
+        print 'polyA',polyA
+        print 'polyB',polyB
+        dist = [(a - b)**2 for a, b in zip(polyA, polyB)]
+        if dist: 
+            dist = np.sqrt(np.sum(dist,axis=1))
+            for i,d in enumerate(dist):
+                if d<epsilon and all(poly[i]-poly[i+1]):
+                    print i, d
+                    print poly[i-1],poly[i],poly[i+1],poly[i+2],poly[i]-poly[i+1]
+                    corner=np.array([poly[i][0],poly[i+1][1]])
+                    if all(poly[i+2]-corner) or all(poly[i-1]-corner):
+                    #     # print('in 1',corner)
+                    #     poly[i]=corner
+                    #     poly[i+1]=corner
+                    # else:
+                        corner=np.array([poly[i+1][0],poly[i][1]])
+                        # print('in 2',corner)
+                    poly[i]=corner
+                    poly[i+1]=corner
+                    print('after',poly[i],poly[i+1])
+            # poly=np.vstack({tuple(row) for row in poly})
+        print poly
+        newContour.append(poly)
+    return newContour 
 def contour2gds(contour0,args):
     contour=[[ele[0] for ele in arr] for arr in contour0]
-    # print contour
+    # print 'contour1',contour
+    contour=sharpenCorner(contour,args)
+    print 'contour2',contour
     flat_list = [item for sublist in contour for item in sublist]
     # print 'flat_list',flat_list
     x=[arr[0] for arr in flat_list]
@@ -60,7 +129,8 @@ def contour2gds(contour0,args):
     ylength=max(y)-min(y)
     
     maxY=max(y)
-    contour=[[[ele[0][0],maxY-ele[0][1]] for ele in arr] for arr in contour0]
+    # contour=[[[ele[0][0],maxY-ele[0][1]] for ele in arr] for arr in contour0]
+    contour=[[[ele[0],maxY-ele[1]] for ele in arr] for arr in contour]
     
     # for sublist in contour:
     #     for ele in sublist:
