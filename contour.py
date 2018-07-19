@@ -74,7 +74,6 @@ def sharpenCorner(contour,args):
                     poly[i]=corner
                     poly[i+1]=corner
             # poly=np.vstack({tuple(row) for row in poly})
-        print poly
         newContour.append(poly)
     return newContour 
 def contour2gds(contour0,args):
