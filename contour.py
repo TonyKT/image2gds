@@ -52,35 +52,7 @@ def getContour(args):
     # cv2.imwrite('contour.png',im2)
 
     return contour
-#
-# def seqCorner(poly):
-#     epsilon=3
-#     poly=np.array(poly)
-#     print poly
-#     nP=len(poly)
-#     polyA=poly[:nP-1]
-#     polyB=poly[1:]
-#     print 'polyA',polyA
-#     print 'polyB',polyB
-#     dist = [(a - b)**2 for a, b in zip(polyA, polyB)]
-#     if dist: 
-#         dist = np.sqrt(np.sum(dist,axis=1))
-#         for i,d in enumerate(dist):
-#             if d<epsilon and all(poly[i]-poly[i+1]):
-#                 print i, d
-#                 print poly[i],poly[i+1],poly[i]-poly[i+1]
-#                 corner=np.array([poly[i][0],poly[i+1][1]])
-#                 if not all(poly[i+2]-corner) and not all(poly[i-1]-corner):
-#                     continue
-#                 else:
-#                     corner=np.array([poly[i+1][0],poly[i][1]])
-#                 poly[i]=corner
-#                 poly[i+1]=corner
-#             continue
-#         # poly=np.vstack({tuple(row) for row in poly})
-#     print poly
-#         # exit()
-#     return poly
+
 def sharpenCorner(contour,args):
     epsilon=3
     newContour=[]
@@ -97,19 +69,13 @@ def sharpenCorner(contour,args):
             dist = np.sqrt(np.sum(dist,axis=1))
             for i,d in enumerate(dist):
                 if d<epsilon and all(poly[i]-poly[i+1]):
-                    print i, d
-                    print poly[i-1],poly[i],poly[i+1],poly[i+2],poly[i]-poly[i+1]
+                    # print i, d
+                    # print poly[i-1],poly[i],poly[i+1],poly[i+2],poly[i]-poly[i+1]
                     corner=np.array([poly[i][0],poly[i+1][1]])
                     if all(poly[i+2]-corner) or all(poly[i-1]-corner):
-                    #     # print('in 1',corner)
-                    #     poly[i]=corner
-                    #     poly[i+1]=corner
-                    # else:
                         corner=np.array([poly[i+1][0],poly[i][1]])
-                        # print('in 2',corner)
                     poly[i]=corner
                     poly[i+1]=corner
-                    print('after',poly[i],poly[i+1])
             # poly=np.vstack({tuple(row) for row in poly})
         print poly
         newContour.append(poly)
