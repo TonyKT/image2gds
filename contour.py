@@ -58,12 +58,9 @@ def sharpenCorner(contour,args):
     newContour=[]
     for poly in contour:
         poly=np.array(poly)
-        print poly
         nP=len(poly)
         polyA=poly[:nP-1]
         polyB=poly[1:]
-        print 'polyA',polyA
-        print 'polyB',polyB
         dist = [(a - b)**2 for a, b in zip(polyA, polyB)]
         if dist: 
             dist = np.sqrt(np.sum(dist,axis=1))
@@ -84,7 +81,7 @@ def contour2gds(contour0,args):
     contour=[[ele[0] for ele in arr] for arr in contour0]
     # print 'contour1',contour
     contour=sharpenCorner(contour,args)
-    print 'contour2',contour
+    # print 'contour2',contour
     flat_list = [item for sublist in contour for item in sublist]
     # print 'flat_list',flat_list
     x=[arr[0] for arr in flat_list]
