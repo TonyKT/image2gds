@@ -18,7 +18,11 @@ def auto_canny(image, sigma=0.33):
 def getContour(args):
     img = cv2.imread(args.input_image)
     image_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    image_gray = cv2.dilate(image_gray,None)
+   
+    # kernel = np.ones((1,1),np.uint8)
+    # image_gray = cv2.morphologyEx(image_gray, cv2.MORPH_CLOSE, kernel)
+
+    # image_gray = cv2.dilate(image_gray,np.ones((1, 1)))
     #Otsu's Binarization
     if args.background=='white':
         image_gray= cv2.copyMakeBorder(image_gray,10,10,10,10,cv2.BORDER_CONSTANT,value=[255,255,255])
@@ -28,7 +32,6 @@ def getContour(args):
         ret,dst=cv2.threshold(image_gray,0,255,cv2.THRESH_BINARY+cv2.THRESH_OTSU)
     else:
         sys.exit('\tError: background color not supported. use white or black')
-    # dst = cv2.dilate(dst,None)
     
     # dst=auto_canny(img)
     # dst = cv2.dilate(dst,None)
@@ -77,9 +80,11 @@ def sharpenCorner(contour,args):
         newContour.append(poly)
     return newContour 
 def contour2gds(contour0,args):
+    # print 'contour0',contour0
     contour=[[ele[0] for ele in arr] for arr in contour0]
     # print 'contour1',contour
-    contour=sharpenCorner(contour,args)
+    if args.sharpen:
+        contour=sharpenCorner(contour,args)
     # print 'contour2',contour
     flat_list = [item for sublist in contour for item in sublist]
     # print 'flat_list',flat_list
@@ -126,6 +131,7 @@ parser.add_argument('-ny',dest='nY',default=1,help='replicate ny times along y a
 parser.add_argument('-sep',dest='sep',default=0.1,help='separation ratio',type=float)
 parser.add_argument('-scale',dest='scale',default=1.0,help='unit=scale nm',type=float)
 parser.add_argument('-o',dest='out_file',help='output file',type=str)
+parser.add_argument('-sharpen',dest='sharpen',default=False,help='sharpen corner',type=str)
 parser.add_argument('-bg',dest='background',default='white',help='background color of image',type=str)
 args=parser.parse_args()
 contour=getContour(args)
