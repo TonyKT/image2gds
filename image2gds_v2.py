@@ -69,7 +69,8 @@ def sharpenCorner(contour,args):
 def contour2gds(contour0,args):
     """transform contour list to gds """    
     contour=[[ele[0] for ele in arr] for arr in contour0]
-    contour=sharpenCorner(contour,args)
+    if args.sharpen:
+        contour=sharpenCorner(contour,args)
     flat_list = [item for sublist in contour for item in sublist]
     
     x=[arr[0] for arr in flat_list]
@@ -106,6 +107,7 @@ parser.add_argument('-ny',dest='nY',default=1,help='replicate ny times along y a
 parser.add_argument('-sep',dest='sep',default=0.1,help='separation ratio',type=float)
 parser.add_argument('-scale',dest='scale',default=1.0,help='unit=scale nm',type=float)
 parser.add_argument('-o',dest='out_file',help='output file',type=str)
+parser.add_argument('-sharpen',dest='sharpen',default=False,help='sharpen corner',type=str)
 parser.add_argument('-bg',dest='background',default='white',help='background color of image',type=str)
 args=parser.parse_args()
 contour=getContour(args)
