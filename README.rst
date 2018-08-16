@@ -19,3 +19,6 @@ Usage
 * Auto(Only for HV mode with clear separation edge):
 
        python image2gds.py -i target.png  -o out.gds      
+
+* image2gds_v2.py
+  use opencv to do contour extraction 
