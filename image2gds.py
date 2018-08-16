@@ -66,8 +66,8 @@ def image2corners(args):
     return corners,ans
 
 def autoHV(corners,ans):
-    print(ans.shape)    
-    print(corners.shape)    
+    # print(ans.shape)    
+    # print(corners.shape)    
     np.savetxt('corner.txt',corners) 
     # print('corners:')
     # print(corners)
@@ -100,10 +100,10 @@ def endPoint(line):
     sortArray=lineArray[lineArray[:,ax].argsort()]
     minP=sortArray[0]
     maxP=sortArray[-1]
-    print('ax',ax)
-    print(line)
-    print(minP)
-    print(maxP)
+    # print('ax',ax)
+    # print(line)
+    # print(minP)
+    # print(maxP)
     return [minP, maxP]
     # return [minP,maxP,orient]
 
@@ -140,23 +140,23 @@ def auto_connect(hLines,vLines,corners):
     # pairs=np.delete(pairs,0,axis=0)
     # print('npair1',pairs.shape)
     # exit()
-    print('npair0',pairs.shape)
+    # print('npair0',pairs.shape)
     polyset=list()
     polycorner=deque()
     polycorner.extend(pairs[0])
     pairs=np.delete(pairs,0,axis=0)
     setFlag=False
-    print('ployset0',len(polyset))
+    # print('ployset0',len(polyset))
     while True:
         [polycorner,pairs,setFlag]=addPoint2(polycorner,pairs)
         if setFlag: 
             polyset.append(list(polycorner))
-            print('polycorner len',len(polycorner))
-            print(polycorner)
-            print('len pairs',pairs.shape[0])
-            print(pairs)
-            print('polyset len',len(polyset))
-            print(polyset)
+            # print('polycorner len',len(polycorner))
+            # print(polycorner)
+            # print('len pairs',pairs.shape[0])
+            # print(pairs)
+            # print('polyset len',len(polyset))
+            # print(polyset)
             # exit()
             if pairs.shape[0] == 0:
                 print('All polygon set found')
@@ -170,8 +170,8 @@ def auto_connect(hLines,vLines,corners):
         # if pairs.shape[0] == 0:
         #     print('All polygon set found')
         #     break
-    print('polyset')
-    print(polyset)
+    # print('polyset')
+    # print(polyset)
     return polyset
 
 def nearestPoint(pairs,corners):
@@ -257,18 +257,18 @@ def addPoint2(polycorner,pairs):
     setFlag=False
     idx=[]
     for i, pair in enumerate(pairs):
-        print('pair:',pair)
-        print('poly:',polycorner)
+        # print('pair:',pair)
+        # print('poly:',polycorner)
         # print('polycorner0',polycorner[0])
         # print('polycorner-1',polycorner[-1])
         endPoints=[polycorner[0],polycorner[-1]]
         for j, point in enumerate(pair):
             dist=[distance(point,endPoints[x]) for x in [0,1]]
-            print('point',point,'dist',dist)
+            # print('point',point,'dist',dist)
             if dist[0]<epsilon:
                 otherpoint=[pair[1-j]]
-                print('otherpoint0',otherpoint)
-                print('polycorner-1',polycorner[-1])
+                # print('otherpoint0',otherpoint)
+                # print('polycorner-1',polycorner[-1])
                 idx.append(i)
                 if np.all(otherpoint==polycorner[-1]):
                     setFlag=True
@@ -277,8 +277,8 @@ def addPoint2(polycorner,pairs):
                     polycorner.extendleft(otherpoint[::-1])
             elif dist[1]<epsilon:
                 otherpoint=[pair[1-j]]
-                print('otherpoint1',otherpoint)
-                print('polycorner0',polycorner[0])
+                # print('otherpoint1',otherpoint)
+                # print('polycorner0',polycorner[0])
                 idx.append(i)
                 if np.all(otherpoint==polycorner[0]):
                     setFlag=True
@@ -306,7 +306,7 @@ def testPlot(lineData,orient):
         tmpList=tmpList+lineData[i]
     # print(len(tmpList))
     tmpArray=np.array(tmpList)
-    print(tmpArray.shape)
+    # print(tmpArray.shape)
     fig=plt.figure()
     ax=fig.add_subplot(111)
     plt.scatter(tmpArray[:,0],tmpArray[:,1],marker='.',color='gray',s=0.1)
